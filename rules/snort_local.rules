@@ -1,0 +1,11 @@
+# IDPS lab rules for Snort 2.9. Same four detections as suricata_custom.rules.
+# "threshold: type both" = alert once per window after the count is reached.
+# The wording of msg matters: the dashboard classifies on these words.
+
+alert tcp any any -> $HOME_NET any (msg:"Port scan detected"; flags:S,12; threshold:type both, track by_src, count 20, seconds 3; classtype:attempted-recon; priority:3; sid:1000011; rev:2;)
+
+alert tcp any any -> $HOME_NET 22 (msg:"SSH Brute Force attempt"; flags:S,12; threshold:type both, track by_src, count 5, seconds 20; classtype:attempted-admin; priority:2; sid:1000012; rev:2;)
+
+alert icmp any any -> $HOME_NET any (msg:"ICMP flood detected"; itype:8; threshold:type both, track by_src, count 50, seconds 5; classtype:attempted-dos; priority:1; sid:1000013; rev:2;)
+
+alert tcp any any -> $HOME_NET any (msg:"TCP SYN flood detected"; flags:S,12; threshold:type both, track by_src, count 100, seconds 5; classtype:attempted-dos; priority:1; sid:1000014; rev:2;)

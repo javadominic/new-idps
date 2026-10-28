@@ -1,0 +1,19 @@
+# IDPS lab rules for Suricata. The same four detections exist for Snort in
+# snort_local.rules so both engines see identical traffic.
+#
+# "threshold: type both" = alert ONCE per window after the count is reached,
+# so a flood produces one alert per window instead of one per packet.
+# priority 1/2/3 becomes severity high/medium/low on the dashboard.
+
+# Port scan: 20+ new connection attempts (SYN) from one source in 3 seconds.
+alert tcp any any -> $HOME_NET any (msg:"Port scan detected"; flags:S,12; threshold:type both, track by_src, count 20, seconds 3; classtype:attempted-recon; priority:3; sid:2000011; rev:2;)
+
+# SSH password guessing: 5+ new SSH connections from one source in 20 seconds.
+# Counts connection attempts, not packets, so one normal login never trips it.
+alert tcp any any -> $HOME_NET 22 (msg:"SSH Brute Force attempt"; flow:to_server; flags:S,12; threshold:type both, track by_src, count 5, seconds 20; classtype:attempted-admin; priority:2; sid:2000012; rev:2;)
+
+# Ping flood: 50+ echo requests from one source in 5 seconds.
+alert icmp any any -> $HOME_NET any (msg:"ICMP flood detected"; itype:8; threshold:type both, track by_src, count 50, seconds 5; classtype:attempted-dos; priority:1; sid:2000013; rev:2;)
+
+# SYN flood: 100+ new connection attempts from one source in 5 seconds.
+alert tcp any any -> $HOME_NET any (msg:"TCP SYN flood detected"; flags:S,12; threshold:type both, track by_src, count 100, seconds 5; classtype:attempted-dos; priority:1; sid:2000014; rev:2;)

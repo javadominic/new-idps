@@ -1,0 +1,23 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>IDPS</title><link rel="stylesheet" href="/assets/style.css"><link rel="icon" href="data:,"></head>
+<body><div class="app">
+<nav>
+  <div class="brand">IDPS<small>intrusion detection and prevention</small></div>
+  <a class="tab" href="#/overview" data-page="overview">Overview</a>
+  <a class="tab" href="#/alerts" data-page="alerts">Alerts</a>
+  <a class="tab" href="#/blocked" data-page="blocked">Blocked</a>
+  <a class="tab" href="#/agents" data-page="agents">Websites and computers</a>
+  <a class="tab" href="#/simulator" data-page="simulator">Simulator and tests</a>
+  <a class="tab" href="#/setup" data-page="setup">Setup and health</a>
+  <a class="tab" href="#/settings" data-page="settings">Settings</a>
+  <div class="sp"></div>
+  <a class="tab" href="/report?days=7" target="_blank">Weekly report</a>
+  <div class="who" id="who"></div>
+  <a class="tab" href="#" data-act="logout">Sign out</a>
+</nav>
+<main><div id="view"><p class="dim">Loading...</p></div></main>
+</div>
+<div class="scrim" id="scrim"></div><aside class="drawer" id="drawer" aria-live="polite"></aside>
+<script src="/assets/app.js"></script>
+</body></html>

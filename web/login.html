@@ -1,0 +1,9 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>IDPS sign in</title><link rel="stylesheet" href="/assets/style.css"><link rel="icon" href="data:,"></head>
+<body><div class="login">
+<h1>IDPS</h1><p class="sub">Sign in to your security dashboard.</p>
+<label for="pw">Password</label><input type="password" id="pw" autocomplete="current-password" autofocus>
+<button class="btn pri" id="go">Sign in</button><div class="err" id="err"></div>
+<p class="hint">Your password was shown once when the system first started. Lost it? On the server run: <span class="mono">python3 manage.py set-password</span></p>
+</div><script src="/assets/login.js"></script></body></html>

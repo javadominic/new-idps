@@ -1,0 +1,6 @@
+[honeypot] listening on 2222 (ssh)[honeypot] listening on 8081 (http)
+
+[honeypot] listening on 2323 (telnet)
+[notify] [Urgent] Decoy service touched | 127.0.0.1 connected to a decoy service that no real user ever needs. | What we did: Not blocked because this address is on your protected list. | What to do: Almost certainly an attacker or scanner. Keep it blocked. | Source: 127.0.0.1 
+Traceback (most recent call last):
+  File "/Library/Developer/CommandLineTools/Library/Frameworks/Python3.framework/Versions/3.9/lib/python3.9/runpy.py", line 197, in _run_module_as_main
