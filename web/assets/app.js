@@ -162,7 +162,7 @@ function feedRow(e, isNew) {
 
 function topHeader(title, subtitle, iconSvg) {
   const isLive = S.ov ? S.ov.mode === "live" : false;
-  const highCount = (S.ov && S.ov.counts && S.ov.counts.high) || 0;
+  const highCount = Math.max(0, ((S.ov && S.ov.counts && S.ov.counts.high) || 0) - getVisited("high"));
   const defaultIcon = `<svg viewBox="0 0 24 24" fill="none">
     <path d="M12 2L3 7v6c0 5.55 3.84 10.74 9 12 5.16-1.26 9-6.45 9-12V7l-9-5z" fill="url(#hexShieldGrad)" stroke="#2ee59d" stroke-width="1.5"/>
     <polyline points="9 12 11 14 15 10" stroke="#080c16" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/>
@@ -288,7 +288,7 @@ async function pageOverview() {
           <path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/>
           <path d="M13.73 21a2 2 0 0 1-3.46 0"/>
         </svg>
-        ${c.high > 0 ? `<span class="btn-badge">${c.high}</span>` : ""}
+        ${Math.max(0, (c.high || 0) - getVisited("high")) > 0 ? `<span class="btn-badge">${Math.max(0, (c.high || 0) - getVisited("high"))}</span>` : ""}
       </a>
 
       <div class="user-avatar" title="Signed in as Saeed">SA</div>
@@ -1748,18 +1748,47 @@ async function loadOverview(refreshPage) {
   S.ov = await api("/api/overview"); navBadges();
   if (refreshPage && S.page === "overview") pageOverview();
 }
+// Visited tracking so badges clear when the user visits the page
+function getVisited(key) {
+  try { return parseInt(localStorage.getItem("idps_visited_" + key) || "0", 10); } catch (e) { return 0; }
+}
+function markVisited(key, count) {
+  try { localStorage.setItem("idps_visited_" + key, String(count || 0)); } catch (e) {}
+}
+
 function navBadges() {
   const o = S.ov; if (!o) return;
-  const set = (p, n) => {
+
+  // If user is currently on that page, mark it visited immediately
+  if (S.page === "alerts") {
+    markVisited("alerts", o.counts.alerts || 0);
+    markVisited("high", o.counts.high || 0);
+  } else if (S.page === "blocked") {
+    markVisited("blocked", o.counts.blocked || 0);
+  } else if (S.page === "setup") {
+    markVisited("setup", (o.health.fails || 0) + (o.health.warns || 0));
+  }
+
+  const set = (p, n, visitedKey) => {
     const a = $(`nav a[data-page=${p}]`); if (!a) return;
     let b = $(".badge-n", a);
-    if (!n || n <= 0) { if (b) b.remove(); return; }
+    const unread = Math.max(0, (n || 0) - getVisited(visitedKey || p));
+    if (!unread || unread <= 0) { if (b) b.remove(); return; }
     if (!b) { b = document.createElement("span"); b.className = "badge-n"; a.appendChild(b); }
-    b.textContent = n;
+    b.textContent = unread;
   };
-  set("alerts", o.counts.alerts);
-  set("blocked", o.counts.blocked);
-  set("setup", o.health.fails + o.health.warns);
+
+  set("alerts", o.counts.alerts, "alerts");
+  set("blocked", o.counts.blocked, "blocked");
+  set("setup", (o.health.fails || 0) + (o.health.warns || 0), "setup");
+
+  // Top bell icon badge
+  const unreadHigh = Math.max(0, (o.counts.high || 0) - getVisited("high"));
+  const bellBadges = $$(".header-action-btn .btn-badge");
+  bellBadges.forEach(bg => {
+    if (unreadHigh <= 0) bg.remove();
+    else bg.textContent = unreadHigh;
+  });
 }
 let _liveTimer;
 function startStream() {
