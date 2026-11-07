@@ -1,4 +1,3 @@
-"""Telegram and email delivery against local mock servers (no internet, no real accounts)."""
 import json, os, socket, sys, tempfile, threading, time
 from http.server import BaseHTTPRequestHandler, HTTPServer
 os.environ["IDPS_DATA"] = tempfile.mkdtemp(); os.environ["IDPS_LOGS"] = tempfile.mkdtemp()

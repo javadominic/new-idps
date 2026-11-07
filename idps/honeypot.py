@@ -1,12 +1,3 @@
-"""
-Decoy services. Nothing real lives on these ports, so ANY connection is an
-attacker or scanner: a detection with almost no false positives.
-
-    2222 -> pretends to be SSH      8081 -> pretends to be an admin web page
-    2323 -> pretends to be telnet   (ports are editable in Settings)
-
-It never executes anything and never replies with real data.
-"""
 import socket
 import threading
 import time

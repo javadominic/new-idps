@@ -1,8 +1,3 @@
-"""
-Adds location (free GeoLite2 database) to an IP. Returns None when the database
-is not installed or the IP is private - a lab uses private addresses, so most
-lab traffic has no location, and the dashboard says so instead of guessing.
-"""
 import ipaddress
 import os
 from . import config

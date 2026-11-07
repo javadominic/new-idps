@@ -1,4 +1,3 @@
-"""Fast check of the agent's web-attack detection: many real attack strings, many harmless URLs."""
 import os, sys
 sys.path.insert(0, os.path.join(os.path.dirname(os.path.dirname(os.path.abspath(__file__))), "host_agent"))
 import agent

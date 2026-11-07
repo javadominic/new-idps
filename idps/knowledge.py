@@ -1,8 +1,3 @@
-"""
-Turns a raw detection ("ICMP flood detected") into something a non-technical
-person can act on: what happened, why it matters, what to do, and the
-MITRE ATT&CK technique it maps to. Pure lookup, no network access.
-"""
 import re
 
 SEV_RANK = {"low": 1, "medium": 2, "high": 3}

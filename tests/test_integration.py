@@ -1,11 +1,3 @@
-"""
-End-to-end test: starts the REAL system (run.py -> API, watchers, honeypot,
-maintenance as separate processes), logs in over HTTP, opens the live stream
-like a browser would, then makes other processes produce alerts and checks
-they arrive live. Needs: requests. Uses real iptables if available.
-
-    python3 tests/test_integration.py
-"""
 import json
 import os
 import shutil

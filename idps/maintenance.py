@@ -1,9 +1,3 @@
-"""
-Housekeeping that must happen on its own, with nobody remembering a cron job:
-  * every 5 seconds  remove blocks whose time is up
-  * at start         re-apply unexpired blocks (they vanish from the kernel on reboot)
-  * every day        refresh the free threat lists and delete old events
-"""
 import threading
 import time
 from . import config, db, firewall, intel

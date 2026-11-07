@@ -1,16 +1,3 @@
-"""
-Two ways to demonstrate the system.
-
-1. SAFE DEMO (this file, run_scenario): injects clearly labelled fake attacks
-   through the REAL pipeline (understand -> decide -> block -> notify ->
-   dashboard). No packets are sent anywhere. Source addresses come from the
-   reserved documentation ranges (198.51.100.0/24 and 203.0.113.0/24), which
-   never belong to a real machine, so even in Live mode nothing real is blocked.
-
-2. REAL LAB TEST (simulator/lab_attacks.py + report()): attacks your own lab
-   machines for real, and report() builds the expected-vs-detected table per
-   engine, with detection time, for your project report.
-"""
 import random
 import time
 from . import config, correlator, db, intel

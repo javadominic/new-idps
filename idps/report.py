@@ -1,4 +1,3 @@
-"""Printable summary report (and CSV export) for your project write-up."""
 import csv
 import html
 import io

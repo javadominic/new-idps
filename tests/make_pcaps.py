@@ -1,4 +1,3 @@
-"""Builds a capture with 4 attacks and 2 harmless sessions for testing real Snort/Suricata."""
 import sys
 from scapy.all import Ether, IP, TCP, ICMP, wrpcap
 

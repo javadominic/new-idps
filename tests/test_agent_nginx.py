@@ -1,11 +1,3 @@
-"""
-Real-world agent test (needs root, nginx, curl). It:
-  1. starts the manager and real nginx (writing /var/log/nginx/access.log)
-  2. installs the agent with the REAL installer script from the dashboard
-  3. sends real attacks and harmless requests with curl
-  4. checks what the manager recorded (including false positives)
-  5. tests file monitoring, offline spooling, revocation, and the IIS log format
-"""
 import json
 import os
 import shutil

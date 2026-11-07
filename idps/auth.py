@@ -1,4 +1,3 @@
-"""Password hashing and first-run secrets. Nothing here is a default password."""
 import hashlib
 import hmac
 import os

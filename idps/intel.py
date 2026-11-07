@@ -1,14 +1,3 @@
-"""
-Free threat-intelligence blocklists (no account, no key).
-  firehol_level1  - FireHOL's aggregated list of attack sources
-  feodo           - abuse.ch Feodo Tracker botnet servers
-  custom          - your own list (data/intel/custom.txt), may include lab IPs
-
-Private/lab addresses are never matched against the public lists (FireHOL's
-list includes bogon ranges that would wrongly flag every lab machine). Only the
-custom list can match private addresses, which is how you demo the feature in
-an isolated lab.
-"""
 import bisect
 import ipaddress
 import os

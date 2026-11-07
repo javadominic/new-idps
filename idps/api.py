@@ -1,12 +1,3 @@
-"""
-The dashboard's backend. Everything except /api/enroll, /api/ingest, the agent
-download routes and /api/sim/mark requires the admin login.
-
-Live updates: /api/stream reads NEW ROWS FROM THE DATABASE, so an alert written
-by any other process (Suricata watcher, Snort watcher, honeypot) reaches the
-browser within a second. (My first version used an in-process queue, which
-only worked for alerts that arrived through this same process.)
-"""
 import hashlib
 import ipaddress
 import json

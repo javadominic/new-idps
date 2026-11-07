@@ -1,16 +1,3 @@
-"""
-Reads the alert logs that Suricata and Snort write and hands every alert to the
-correlator. One process per engine:
-
-    python -m idps.watchers suricata
-    python -m idps.watchers snort
-
-Options (used by tests and the demo): --file PATH, --from-start, --once.
-
-The parsers were checked against output from real Suricata 7 and Snort 2.9.
-Suricata also writes "stats" records; we keep the latest so the health page can
-warn when the sensor is dropping packets (an IDS that drops packets is blind).
-"""
 import argparse
 import json
 import os

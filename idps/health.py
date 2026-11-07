@@ -1,9 +1,3 @@
-"""
-The setup checklist and health page. Every item says what is wrong in plain
-words and how to fix it, so an empty dashboard is never a mystery.
-Silent failure is the worst failure of an IDS: a sensor that stopped reading
-looks exactly like a quiet network. So we check that logs are still growing.
-"""
 import json
 import os
 import shutil

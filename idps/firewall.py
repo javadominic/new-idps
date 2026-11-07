@@ -1,15 +1,3 @@
-"""
-The only module that touches the firewall.
-
-Design:
-  * All blocks live in their own chain, IDPS_BLOCK, jumped to from INPUT and
-    FORWARD. INPUT protects this machine; FORWARD protects machines behind it
-    when it runs as a gateway. "Unblock everyone" is a single chain flush and
-    never disturbs your other firewall rules.
-  * Blocks are stored in the database too, so they are re-applied after a
-    reboot (iptables rules are lost on reboot) and expire on schedule.
-  * Every call is safe to repeat: blocking an already-blocked IP does nothing.
-"""
 import ipaddress
 import os
 import shutil

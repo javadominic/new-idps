@@ -1,9 +1,3 @@
-"""
-SQLite is the message bus between every process (watchers, honeypot, API,
-maintenance). Each process writes rows; the API's live stream reads new rows.
-That is what makes alerts from separate processes appear live on the dashboard.
-WAL mode lets many processes read and write at once.
-"""
 import sqlite3
 import time
 import threading

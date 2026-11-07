@@ -1,7 +1,3 @@
-"""
-Settings live in the database so the dashboard can change them live and every
-process sees the change within a second. No restart, no file editing.
-"""
 import json
 import time
 from . import db, paths

@@ -1,11 +1,4 @@
 #!/usr/bin/env python3
-"""
-One command starts everything:   sudo python3 run.py
-
-Starts the dashboard/API, the Suricata and Snort readers, the honeypot and the
-cleanup job as separate processes, and restarts any that crash. On the very
-first run it creates your login and prints it ONCE.
-"""
 import argparse
 import os
 import re

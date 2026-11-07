@@ -1,11 +1,3 @@
-"""
-The "does everything actually work?" button. Runs real checks on every function
-(database, decisions, firewall, expiry, notifications, live stream, parsers,
-agent enrollment, honeypot, threat lists) using reserved test addresses
-(192.0.2.0/24) that never belong to a real machine, then cleans up after itself.
-
-Run from the dashboard (Setup > Run self-test) or: python3 manage.py selftest
-"""
 import json
 import socket
 import time

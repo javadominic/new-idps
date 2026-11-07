@@ -1,4 +1,3 @@
-"""Filesystem locations. Everything the app writes lives under data/ and logs/."""
 import os
 
 ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))

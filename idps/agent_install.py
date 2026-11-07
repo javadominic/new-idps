@@ -1,8 +1,3 @@
-"""
-Builds the installer scripts the dashboard's "Add agent" wizard hands out.
-The manager fills in its own address and the enrollment password, so the
-person adding a machine pastes ONE command and edits nothing.
-"""
 import re
 
 SH = r'''#!/bin/sh

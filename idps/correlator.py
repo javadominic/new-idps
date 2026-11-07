@@ -1,12 +1,3 @@
-"""
-The decision engine. EVERY detection - Suricata, Snort, the host agent, the
-honeypot, the simulator - comes through handle_event(), so protection,
-shadow mode, dedupe and the safety caps apply the same way to all of them.
-
-It never runs a firewall command itself except through firewall.py, and it
-writes everything to the database, which is how other processes (the live
-dashboard stream) find out.
-"""
 import ipaddress
 import re
 import shutil

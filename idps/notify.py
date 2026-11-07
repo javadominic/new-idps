@@ -1,8 +1,3 @@
-"""
-Tells a human. Console always; Telegram and email if configured (both free).
-A cooldown stops the same attacker from sending you a message every second.
-Sending runs in a background thread so a slow mail server never slows detection.
-"""
 import json
 import smtplib
 import threading

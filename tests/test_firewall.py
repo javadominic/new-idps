@@ -1,5 +1,3 @@
-"""Real firewall behaviour (needs root + iptables): block, no double-block, protection, expiry,
-repeat-offender, reboot restore, panic button, per-minute cap, and injection safety."""
 import os, sys, tempfile, time
 os.environ["IDPS_DATA"] = tempfile.mkdtemp(); os.environ["IDPS_LOGS"] = tempfile.mkdtemp()
 sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
