@@ -130,7 +130,7 @@ def login():
     if not auth.check_password(pw):
         _bump(_login_fail, ip)
         return jsonify(error="Wrong password."), 401
-    _login_fail.pop(ip, None)
+    _login_fail.clear()
     session.permanent = True
     session["u"] = "admin"
     return jsonify(ok=True)
@@ -146,7 +146,9 @@ def logout():
 @login_required
 def me():
     ip = request.remote_addr
+    name = config.get("admin_name") or "Saeed Ansari"
     return jsonify(ip=ip, protected=bool(correlator.protected_reason(ip)), mode=config.get("mode"), version=VERSION,
+                   admin_name=name,
                    first_run=db.one("SELECT COUNT(*) n FROM events")["n"] == 0)
 
 

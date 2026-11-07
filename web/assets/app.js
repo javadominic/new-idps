@@ -160,9 +160,19 @@ function feedRow(e, isNew) {
   </tr>`;
 }
 
+function getUserProfile() {
+  const name = (S.me && S.me.admin_name) || localStorage.getItem("idps_admin_name") || "Saeed Ansari";
+  const parts = name.trim().split(/\s+/).filter(Boolean);
+  const first = parts[0] || "User";
+  const last = parts.length > 1 ? parts[parts.length - 1] : "";
+  const initials = (first[0] || "U") + (last ? last[0] : "");
+  return { fullName: name, firstName: first, lastName: last, initials: initials.toUpperCase() };
+}
+
 function topHeader(title, subtitle, iconSvg) {
   const isLive = S.ov ? S.ov.mode === "live" : false;
   const highCount = Math.max(0, ((S.ov && S.ov.counts && S.ov.counts.high) || 0) - getVisited("high"));
+  const user = getUserProfile();
   const defaultIcon = `<svg viewBox="0 0 24 24" fill="none">
     <path d="M12 2L3 7v6c0 5.55 3.84 10.74 9 12 5.16-1.26 9-6.45 9-12V7l-9-5z" fill="url(#hexShieldGrad)" stroke="#2ee59d" stroke-width="1.5"/>
     <polyline points="9 12 11 14 15 10" stroke="#080c16" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/>
@@ -199,7 +209,7 @@ function topHeader(title, subtitle, iconSvg) {
         ${highCount > 0 ? `<span class="btn-badge">${highCount}</span>` : ""}
       </a>
 
-      <div class="user-avatar" title="Signed in as Saeed">SA</div>
+      <div class="user-avatar" title="Signed in as ${esc(user.fullName)}" data-act="edit-profile" style="cursor:pointer">${esc(user.initials)}</div>
     </div>
   </header>`;
 }
@@ -211,6 +221,7 @@ async function pageOverview() {
   const c = ov.counts || { alerts: 0, high: 0, blocked: 0, would_block: 0, agents_online: 0 };
   const unprot = S.me && !S.me.protected;
   const isLive = ov.mode === "live";
+  const user = getUserProfile();
 
   // Feed items: real alerts from database
   let feedRowsHtml = "";
@@ -272,7 +283,7 @@ async function pageOverview() {
         </svg>
       </div>
       <div class="welcome-text">
-        <h1 class="t">Welcome back, Saeed!</h1>
+        <h1 class="t">Welcome back, ${esc(user.firstName)}!</h1>
         <p class="m">${esc(ov.headline || "Your network is protected and monitored in real-time.")}</p>
       </div>
     </div>
@@ -291,7 +302,7 @@ async function pageOverview() {
         ${Math.max(0, (c.high || 0) - getVisited("high")) > 0 ? `<span class="btn-badge">${Math.max(0, (c.high || 0) - getVisited("high"))}</span>` : ""}
       </a>
 
-      <div class="user-avatar" title="Signed in as Saeed">SA</div>
+      <div class="user-avatar" title="Signed in as ${esc(user.fullName)}" data-act="edit-profile" style="cursor:pointer">${esc(user.initials)}</div>
     </div>
   </header>
 
@@ -1449,6 +1460,7 @@ async function pageSetup() {
 
 /* ---------- settings ---------- */
 const SCHEMA = [
+  ["Profile", [["admin_name", "Operator Name (First & Last Name)", "text", "Shown on the dashboard greeting and initials avatar."]]],
   ["Blocking", [["block_ttl_minutes", "How long a block lasts (minutes)", "number", "Repeat offenders are blocked for twice as long each time."], ["severity_block_threshold", "Block attackers rated at least", "sev", "Urgent is the safe default."], ["max_blocks_per_minute", "Safety limit: most automatic blocks per minute", "number", "Stops a flood of fake sources from locking you out."], ["dedupe_window_seconds", "Ignore repeats from the same attacker for (seconds)", "number", ""]]],
   ["Notifications", [["notify_min_severity", "Tell me about", "sev", "Dashboard always shows everything."], ["notify_cooldown_seconds", "Quiet time per attacker (seconds)", "number", "So one attacker cannot send you a message every second."], ["telegram_token", "Telegram bot token", "secret", "Free. Create a bot with @BotFather in Telegram."], ["telegram_chat_id", "Telegram chat ID", "text", "Send your bot a message, then open https://api.telegram.org/bot<token>/getUpdates to find it."], ["smtp_host", "Email server (SMTP)", "text", "For Gmail: smtp.gmail.com with an app password."], ["smtp_port", "Email port", "number", ""], ["smtp_user", "Email username", "text", ""], ["smtp_pass", "Email password", "secret", ""], ["smtp_from", "Send from", "text", ""], ["smtp_to", "Send alerts to", "text", ""]]],
   ["Decoys and threat lists", [["honeypot_enabled", "Decoy services on", "check", "Fake SSH, admin page and telnet. Anyone touching them is an attacker."], ["honeypot_ports", "Decoy ports", "text", "Space separated. Restart the service after changing."], ["intel_enabled", "Use free threat lists", "check", "FireHOL and abuse.ch lists of known bad addresses."]]],
@@ -1551,7 +1563,7 @@ async function pageSettings() {
         <div class="settings-card-header">
           <h3 class="settings-card-title">Firewall & Blocking</h3>
         </div>
-        ${SCHEMA[0][1].map(([k, l, t, h]) => field(k, l, t, h, s[k])).join("")}
+        ${SCHEMA.find(x => x[0] === "Blocking")[1].map(([k, l, t, h]) => field(k, l, t, h, s[k])).join("")}
       </div>
 
       <!-- CARD 4: NOTIFICATIONS -->
@@ -1563,7 +1575,7 @@ async function pageSettings() {
             <button class="btn sm" data-act="test-notify" data-ch="email">Test email</button>
           </div>
         </div>
-        ${SCHEMA[1][1].map(([k, l, t, h]) => field(k, l, t, h, s[k])).join("")}
+        ${SCHEMA.find(x => x[0] === "Notifications")[1].map(([k, l, t, h]) => field(k, l, t, h, s[k])).join("")}
       </div>
 
       <!-- CARD 5: DECOYS & THREAT LISTS -->
@@ -1572,7 +1584,7 @@ async function pageSettings() {
           <h3 class="settings-card-title">Decoys & Threat Lists</h3>
           <button class="btn sm" data-act="intel-update">Update lists now</button>
         </div>
-        ${SCHEMA[2][1].map(([k, l, t, h]) => field(k, l, t, h, s[k])).join("")}
+        ${SCHEMA.find(x => x[0] === "Decoys and threat lists")[1].map(([k, l, t, h]) => field(k, l, t, h, s[k])).join("")}
         <div class="dim small" style="margin-top:6px">
           ${Object.entries((d.intel && d.intel.lists) || {}).map(([k, v]) => `<b>${esc(k)}</b>: ${v} addresses`).join(" · ") || "Not downloaded yet."}
         </div>
@@ -1587,7 +1599,7 @@ async function pageSettings() {
         <div class="settings-card-header">
           <h3 class="settings-card-title">Network & Retention</h3>
         </div>
-        ${SCHEMA[3][1].map(([k, l, t, h]) => field(k, l, t, h, s[k])).join("")}
+        ${SCHEMA.find(x => x[0] === "Network")[1].map(([k, l, t, h]) => field(k, l, t, h, s[k])).join("")}
       </div>
 
       <!-- CARD 7: ENROLLMENT & AUTH -->
@@ -1638,6 +1650,16 @@ async function saveSettings(btn) {
 /* ---------- actions ---------- */
 const ACT = {
   close: closeDrawer,
+  "edit-profile": () => {
+    const cur = (S.me && S.me.admin_name) || localStorage.getItem("idps_admin_name") || "Saeed Ansari";
+    const name = prompt("Enter your Name & Surname (e.g. Saeed Ansari):", cur);
+    if (name && name.trim()) {
+      localStorage.setItem("idps_admin_name", name.trim());
+      if (S.me) S.me.admin_name = name.trim();
+      api("/api/settings", { admin_name: name.trim() }).catch(() => {});
+      route();
+    }
+  },
   "open-event": t => { const e = S.events.get(+t.dataset.id); if (e) eventDrawer(e); },
   "open-ip": (t, ev) => { ev.preventDefault(); ipDrawer(t.dataset.ip); },
   "block-ip": async t => { const r = await api("/api/block", { ip: t.dataset.ip, minutes: 30 }); toast(esc(r.message || r.error)); ipDrawer(t.dataset.ip); },

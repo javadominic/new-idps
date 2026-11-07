@@ -28,6 +28,7 @@ DEFAULTS = {
     "sim_token": "",
     "secret_key": "",
     "admin_pw_hash": "",
+    "admin_name": "Saeed Ansari",
     "retention_days": 30,
 }
 SECRET = {"telegram_token", "smtp_pass", "admin_pw_hash", "secret_key", "sim_token", "enrollment_password"}

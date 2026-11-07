@@ -31,6 +31,10 @@ def main(a):
         auth.ensure_secrets()
         auth.set_password(pw)
         print("Password changed.")
+    elif c == "reset-login-limit":
+        from idps import api
+        api._login_fail.clear()
+        print("Login rate limits cleared. You can sign in immediately.")
     elif c == "selftest":
         r = selftest.run()
         for t in r["tests"]:
