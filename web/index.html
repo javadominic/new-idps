@@ -1,21 +1,101 @@
 <!doctype html>
 <html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
-<title>IDPS</title><link rel="stylesheet" href="/assets/style.css"><link rel="icon" href="data:,"></head>
+<title>IDPS - Intrusion Detection &amp; Prevention</title>
+<link rel="stylesheet" href="/assets/style.css"><link rel="icon" href="data:,">
+</head>
 <body><div class="app">
 <nav>
-  <div class="brand">IDPS<small>intrusion detection and prevention</small></div>
-  <a class="tab" href="#/overview" data-page="overview">Overview</a>
-  <a class="tab" href="#/alerts" data-page="alerts">Alerts</a>
-  <a class="tab" href="#/blocked" data-page="blocked">Blocked</a>
-  <a class="tab" href="#/agents" data-page="agents">Websites and computers</a>
-  <a class="tab" href="#/simulator" data-page="simulator">Simulator and tests</a>
-  <a class="tab" href="#/setup" data-page="setup">Setup and health</a>
-  <a class="tab" href="#/settings" data-page="settings">Settings</a>
+  <div class="brand">
+    <div class="brand-icon">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+        <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/>
+        <rect x="9" y="10" width="6" height="5" rx="1" fill="currentColor"/>
+        <path d="M10 10V8.5a2 2 0 1 1 4 0V10"/>
+      </svg>
+    </div>
+    <div class="brand-text">
+      <span class="brand-title">IDPS</span>
+      <small class="brand-sub">Intrusion Detection<br>&amp; Prevention</small>
+    </div>
+  </div>
+
+  <div class="nav-links">
+    <a class="tab on" href="#/overview" data-page="overview">
+      <svg class="nav-ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+        <path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/>
+        <polyline points="9 22 9 12 15 12 15 22"/>
+      </svg>
+      <span>Dashboard</span>
+      <span class="active-dot"></span>
+    </a>
+    <a class="tab" href="#/alerts" data-page="alerts">
+      <svg class="nav-ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+        <path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/>
+        <path d="M13.73 21a2 2 0 0 1-3.46 0"/>
+      </svg>
+      <span>Alerts</span>
+    </a>
+    <a class="tab" href="#/blocked" data-page="blocked">
+      <svg class="nav-ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+        <circle cx="12" cy="12" r="10"/>
+        <line x1="4.93" y1="4.93" x2="19.07" y2="19.07"/>
+      </svg>
+      <span>Blocked</span>
+    </a>
+    <a class="tab" href="#/agents" data-page="agents">
+      <svg class="nav-ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+        <circle cx="12" cy="12" r="10"/>
+        <line x1="2" y1="12" x2="22" y2="12"/>
+        <path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/>
+      </svg>
+      <span>Websites &amp; Computers</span>
+    </a>
+    <a class="tab" href="#/simulator" data-page="simulator">
+      <svg class="nav-ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+        <path d="M10 2v7.31L4.14 20.3A2 2 0 0 0 5.86 23h12.28a2 2 0 0 0 1.72-2.7L14 9.31V2"/>
+        <line x1="8.5" y1="2" x2="15.5" y2="2"/>
+        <line x1="7" y1="16" x2="17" y2="16"/>
+      </svg>
+      <span>Simulator &amp; Tests</span>
+    </a>
+    <a class="tab" href="#/setup" data-page="setup">
+      <svg class="nav-ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+        <path d="M22 12h-4l-3 9L9 3l-3 9H2"/>
+      </svg>
+      <span>Setup &amp; Health</span>
+    </a>
+    <a class="tab" href="#/settings" data-page="settings">
+      <svg class="nav-ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+        <circle cx="12" cy="12" r="3"/>
+        <path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"/>
+      </svg>
+      <span>Settings</span>
+    </a>
+  </div>
+
   <div class="sp"></div>
-  <a class="tab" href="/report?days=7" target="_blank">Weekly report</a>
-  <div class="who" id="who"></div>
-  <a class="tab" href="#" data-act="logout">Sign out</a>
+
+  <div class="sidebar-footer">
+    <div class="system-status-card">
+      <div class="sys-status-head">
+        <span class="sys-pulse-dot" id="sys-dot"></span>
+        <span class="sys-status-title" id="sys-status">System Active</span>
+      </div>
+      <div class="sys-sub">Real-time monitoring</div>
+      <div class="sys-label">Signed in from</div>
+      <div class="sys-ip mono" id="who">Connecting...</div>
+      <button class="sys-signout-btn" data-act="logout">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/>
+          <polyline points="16 17 21 12 16 7"/>
+          <line x1="21" y1="12" x2="9" y2="12"/>
+        </svg>
+        <span>Sign Out</span>
+      </button>
+    </div>
+  </div>
 </nav>
+
 <main><div id="view"><p class="dim">Loading...</p></div></main>
 </div>
 <div class="scrim" id="scrim"></div><aside class="drawer" id="drawer" aria-live="polite"></aside>
