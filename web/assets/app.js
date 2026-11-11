@@ -77,7 +77,13 @@ async function ipDrawer(ip) {
     (d.protected ? "" : `<button class="btn bad" data-act="block-ip" data-ip="${esc(d.ip)}">Block for 30 minutes</button>`)}
   ${d.protected ? "" : `<button class="btn" data-act="protect-ip" data-ip="${esc(d.ip)}">Never block this address</button>`}</div>
   <h2>What this address did</h2>
-  ${d.events.length ? `<table>${d.events.slice(0, 60).map(e => { S.events.set(e.id, e); return `<tr class="click" data-act="open-event" data-id="${e.id}"><td class="mono dim">${clock(e.ingested)}</td><td>${sev(e.severity)}</td><td>${esc(e.title)}</td></tr>`; }).join("")}</table>` : '<p class="dim">Nothing recorded.</p>'}`);
+  ${d.events.length ? `<table>${d.events.slice(0, 60).map(e => {
+    S.events.set(e.id, e);
+    const unread = !isEventViewed(e.id);
+    const isHigh = e.severity === "high";
+    const dotHtml = unread ? `<span class="unread-dot ${isHigh ? 'high' : ''}" title="Unviewed alert"></span>` : "";
+    return `<tr class="click ${unread ? 'unread-alert' : 'read-alert'} ${isHigh ? 'sev-high' : ''}" data-act="open-event" data-id="${e.id}"><td class="mono dim">${dotHtml}${clock(e.ingested)}</td><td>${sev(e.severity)}</td><td class="${unread ? 'unread-title' : ''}">${esc(e.title)}</td></tr>`;
+  }).join("")}</table>` : '<p class="dim">Nothing recorded.</p>'}`);
 }
 
 /* ---------- pipeline ---------- */
@@ -115,8 +121,31 @@ async function setMode(m) {
   loadOverview(true); route();
 }
 
+// Visited tracking for individual alerts/events
+function getViewedEvents() {
+  try {
+    return new Set(JSON.parse(localStorage.getItem("idps_viewed_events") || "[]"));
+  } catch (e) {
+    return new Set();
+  }
+}
+function markEventViewed(id) {
+  if (!id) return;
+  const s = getViewedEvents();
+  s.add(Number(id));
+  try {
+    const arr = Array.from(s);
+    if (arr.length > 2500) arr.splice(0, arr.length - 2500);
+    localStorage.setItem("idps_viewed_events", JSON.stringify(arr));
+  } catch (e) {}
+}
+function isEventViewed(id) {
+  return getViewedEvents().has(Number(id));
+}
+
 function feedRow(e, isNew) {
   S.events.set(e.id, e);
+  const unread = !isEventViewed(e.id);
   const isBlocked = e.decision === "blocked" || /blocked/i.test(e.decision_text || "") || /blocked/i.test(e.title || "");
   const isHigh = e.severity === "high";
   const isMed = e.severity === "medium";
@@ -144,19 +173,35 @@ function feedRow(e, isNew) {
   }
 
   const subLine = `${when(e.ingested)} • ${esc(e.decision_text || (e.engine ? 'via ' + e.engine : 'System'))}`;
+  const rowClass = ["click", "act-row", isNew ? "new" : "", unread ? "unread-alert" : "read-alert", isHigh ? "sev-high" : ""].filter(Boolean).join(" ");
+  const dotHtml = unread ? `<span class="unread-dot ${isHigh ? 'high' : ''}" title="Unviewed alert"></span>` : "";
 
-  return `<tr class="click act-row ${isNew ? "new" : ""}" data-act="open-event" data-id="${e.id}">
+  return `<tr class="${rowClass}" data-act="open-event" data-id="${e.id}">
     <td class="act-node-cell">
       <div class="act-node ${nodeClass}">${iconSvg}</div>
     </td>
     <td class="act-content-cell">
-      <div class="act-title">${esc(e.title)}${simTag(e)}</div>
+      <div class="act-title">${dotHtml}${esc(e.title)}${simTag(e)}</div>
       <div class="act-sub">${subLine}</div>
       <div class="dim small explain-text" style="display:none">${esc(e.explain)}</div>
     </td>
     <td class="act-badge-cell">
       <span class="act-pill ${badgeClass}">${esc(badgeText)}</span>
     </td>
+  </tr>`;
+}
+
+function alertRow(e, isNew) {
+  S.events.set(e.id, e);
+  const unread = !isEventViewed(e.id);
+  const isHigh = e.severity === "high";
+  const rowClass = ["click", isNew ? "new" : "", unread ? "unread-alert" : "read-alert", isHigh ? "sev-high" : ""].filter(Boolean).join(" ");
+  const dotHtml = unread ? `<span class="unread-dot ${isHigh ? 'high' : ''}" title="Unviewed alert"></span>` : "";
+  return `<tr class="${rowClass}" data-act="open-event" data-id="${e.id}">
+    <td class="mono dim" style="white-space:nowrap">${dotHtml}${when(e.ingested)}</td>
+    <td>${sev(e.severity)}</td>
+    <td><b class="${unread ? 'unread-title' : ''}">${esc(e.title)}</b>${simTag(e)}${e.count > 1 ? ` <span class="dim mono small">×${e.count}</span>` : ""}<div class="dim small">${esc(e.explain)}</div></td>
+    <td class="dim small">${esc(e.decision_text)}</td>
   </tr>`;
 }
 
@@ -216,7 +261,8 @@ function topHeader(title, subtitle, iconSvg) {
 
 /* ---------- overview ---------- */
 async function pageOverview() {
-  const [ov, al] = await Promise.all([api("/api/overview"), api("/api/alerts?limit=14")]);
+  const period = S.overviewPeriod || "24h";
+  const [ov, al] = await Promise.all([api("/api/overview?period=" + period), api("/api/alerts?limit=14")]);
   S.ov = ov; navBadges();
   const c = ov.counts || { alerts: 0, high: 0, blocked: 0, would_block: 0, agents_online: 0 };
   const unprot = S.me && !S.me.protected;
@@ -607,6 +653,11 @@ async function pageOverview() {
 
   drawChart(ov.series || []);
   drawMap(ov.map || []);
+  const periodSel = $("#overview-period");
+  if (periodSel) {
+    periodSel.value = period;
+    periodSel.addEventListener("change", () => { S.overviewPeriod = periodSel.value; pageOverview(); });
+  }
 }
 
 /* ---------- Canvas Area Line Chart (Real Series Data) ---------- */
@@ -821,26 +872,24 @@ async function pageAlerts() {
   <div class="bar"><input type="text" id="f-q" placeholder="Search address, rule or machine" value="${esc(f.q || "")}" style="width:260px">
   <select id="f-sev"><option value="">All severities</option><option value="high">Urgent</option><option value="medium">Suspicious</option><option value="low">Heads-up</option></select>
   <select id="f-eng"><option value="">All sources</option><option>suricata</option><option>snort</option><option>weblog</option><option>fim</option><option>honeypot</option><option>simulator</option></select>
+  <select id="f-days"><option value="">All time</option><option value="1">Last 24 hours</option><option value="7">Last 7 days</option><option value="30">Last 30 days</option></select>
   <label style="margin:0;display:flex;gap:6px;align-items:center"><input type="checkbox" id="f-sim" ${f.nosim ? "checked" : ""}> Hide demo alerts</label>
+  <button class="btn sm" data-act="mark-all-read" title="Mark all displayed alerts as viewed">Mark all viewed</button>
   <a href="/api/export/events.csv" class="btn sm">Download CSV</a></div>
   <table><thead><tr><th>Time</th><th>Level</th><th>What happened</th><th>What we did</th></tr></thead><tbody id="alist"></tbody></table>
   <div class="bar"><button class="btn" id="more" data-act="load-more" style="display:none">Load older</button></div>`;
-  $("#f-sev").value = f.severity || ""; $("#f-eng").value = f.engine || "";
-  ["f-q", "f-sev", "f-eng", "f-sim"].forEach(id => $("#" + id).addEventListener("input", () => { S.filters = { q: $("#f-q").value, severity: $("#f-sev").value, engine: $("#f-eng").value, nosim: $("#f-sim").checked }; clearTimeout(S._ft); S._ft = setTimeout(() => loadAlerts(true), 250); }));
+  $("#f-sev").value = f.severity || ""; $("#f-eng").value = f.engine || ""; $("#f-days").value = f.days || "";
+  ["f-q", "f-sev", "f-eng", "f-days", "f-sim"].forEach(id => $("#" + id).addEventListener("input", () => { S.filters = { q: $("#f-q").value, severity: $("#f-sev").value, engine: $("#f-eng").value, days: $("#f-days").value, nosim: $("#f-sim").checked }; clearTimeout(S._ft); S._ft = setTimeout(() => loadAlerts(true), 250); }));
   loadAlerts(true);
 }
 async function loadAlerts(reset) {
   const f = S.filters, tb = $("#alist"); if (!tb) return;
   const p = new URLSearchParams({ limit: 60 });
-  if (f.q) p.set("q", f.q); if (f.severity) p.set("severity", f.severity); if (f.engine) p.set("engine", f.engine); if (f.nosim) p.set("sim", "0");
+  if (f.q) p.set("q", f.q); if (f.severity) p.set("severity", f.severity); if (f.engine) p.set("engine", f.engine); if (f.nosim) p.set("sim", "0"); if (f.days) p.set("days", f.days);
   if (!reset && S.lastId) p.set("before", S.lastId);
   const rows = await api("/api/alerts?" + p);
   if (reset) tb.innerHTML = "";
-  tb.insertAdjacentHTML("beforeend", rows.map(e => {
-    S.events.set(e.id, e);
-    return `<tr class="click" data-act="open-event" data-id="${e.id}"><td class="mono dim" style="white-space:nowrap">${when(e.ingested)}</td><td>${sev(e.severity)}</td>
-    <td><b>${esc(e.title)}</b>${simTag(e)}${e.count > 1 ? ` <span class="dim mono small">×${e.count}</span>` : ""}<div class="dim small">${esc(e.explain)}</div></td><td class="dim small">${esc(e.decision_text)}</td></tr>`;
-  }).join(""));
+  tb.insertAdjacentHTML("beforeend", rows.map(e => alertRow(e)).join(""));
   if (rows.length) S.lastId = rows[rows.length - 1].id;
   if (reset && !rows.length) tb.innerHTML = '<tr><td colspan="4" class="dim">No alerts match.</td></tr>';
   $("#more").style.display = rows.length >= 60 ? "" : "none";
@@ -1660,7 +1709,36 @@ const ACT = {
       route();
     }
   },
-  "open-event": t => { const e = S.events.get(+t.dataset.id); if (e) eventDrawer(e); },
+  "open-event": t => {
+    const id = +t.dataset.id;
+    if (id) {
+      markEventViewed(id);
+      $$(`tr[data-id="${id}"]`).forEach(r => {
+        r.classList.remove("unread-alert");
+        r.classList.add("read-alert");
+        const dot = r.querySelector(".unread-dot");
+        if (dot) dot.remove();
+        const b = r.querySelector(".unread-title");
+        if (b) b.classList.remove("unread-title");
+      });
+    }
+    const e = S.events.get(id);
+    if (e) eventDrawer(e);
+  },
+  "mark-all-read": () => {
+    $$("tr[data-id]").forEach(r => {
+      const id = +r.dataset.id;
+      if (id) markEventViewed(id);
+      r.classList.remove("unread-alert");
+      r.classList.add("read-alert");
+      const dot = r.querySelector(".unread-dot");
+      if (dot) dot.remove();
+      const b = r.querySelector(".unread-title");
+      if (b) b.classList.remove("unread-title");
+    });
+    if (S.events) S.events.forEach(e => markEventViewed(e.id));
+    toast("All visible alerts marked as viewed.");
+  },
   "open-ip": (t, ev) => { ev.preventDefault(); ipDrawer(t.dataset.ip); },
   "block-ip": async t => { const r = await api("/api/block", { ip: t.dataset.ip, minutes: 30 }); toast(esc(r.message || r.error)); ipDrawer(t.dataset.ip); },
   unblock: async t => { await api("/api/unblock", { ip: t.dataset.ip }); toast("Unblocked " + esc(t.dataset.ip)); closeDrawer(); route(); },
@@ -1829,7 +1907,7 @@ function startStream() {
       }
       fireDot(e.severity);
     }
-    if (S.page === "alerts" && !Object.values(S.filters).some(Boolean)) { const tb = $("#alist"); if (tb) tb.insertAdjacentHTML("afterbegin", feedRow(e, true)); }
+    if (S.page === "alerts" && !Object.values(S.filters).some(Boolean)) { const tb = $("#alist"); if (tb) tb.insertAdjacentHTML("afterbegin", alertRow(e, true)); }
     if (e.severity === "high") { toast(`<b>${esc(e.title)}</b><div class="small">${esc(e.explain)}</div><div class="dim small">${esc(e.decision_text)}</div>`, "high"); beep(); }
     clearTimeout(_liveTimer); _liveTimer = setTimeout(() => loadOverview(S.page === "overview"), 1500);
   });

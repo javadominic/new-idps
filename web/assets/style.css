@@ -927,6 +927,82 @@ tr.new td { animation: flash 1.6s ease-out; }
 .small { font-size: 12.5px; }
 .right { text-align: right; }
 
+/* ---------- UNREAD / UNVIEWED ALERT HIGHLIGHTING ---------- */
+tr.unread-alert td {
+  background: rgba(37, 99, 235, 0.08) !important;
+  transition: background 0.2s ease;
+}
+tr.unread-alert:hover td {
+  background: rgba(37, 99, 235, 0.15) !important;
+}
+tr.unread-alert td:first-child {
+  box-shadow: inset 3.5px 0 0 0 var(--accent-blue);
+  padding-left: 14px;
+}
+tr.unread-alert.sev-high td {
+  background: rgba(255, 77, 109, 0.08) !important;
+}
+tr.unread-alert.sev-high:hover td {
+  background: rgba(255, 77, 109, 0.15) !important;
+}
+tr.unread-alert.sev-high td:first-child {
+  box-shadow: inset 3.5px 0 0 0 var(--bad);
+}
+tr.unread-alert b,
+tr.unread-alert .unread-title {
+  color: #ffffff;
+  font-weight: 600;
+  text-shadow: 0 0 10px rgba(255, 255, 255, 0.2);
+}
+tr.read-alert {
+  opacity: 0.78;
+  transition: opacity 0.2s ease;
+}
+tr.read-alert:hover {
+  opacity: 1;
+}
+
+.unread-dot {
+  display: inline-block;
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: var(--accent-blue);
+  box-shadow: 0 0 8px var(--accent-blue);
+  margin-right: 7px;
+  vertical-align: middle;
+  animation: pulse-dot 2.2s infinite ease-in-out;
+}
+.unread-dot.high {
+  background: var(--bad);
+  box-shadow: 0 0 8px var(--bad);
+}
+@keyframes pulse-dot {
+  0%, 100% { transform: scale(1); opacity: 0.85; }
+  50% { transform: scale(1.3); opacity: 1; }
+}
+
+.act-row.unread-alert td {
+  background: rgba(37, 99, 235, 0.14) !important;
+  border-color: rgba(37, 99, 235, 0.4) !important;
+}
+.act-row.unread-alert:hover td {
+  background: rgba(37, 99, 235, 0.2) !important;
+}
+.act-row.unread-alert td:first-child {
+  border-left: 3px solid var(--accent-blue) !important;
+}
+.act-row.unread-alert.sev-high td {
+  background: rgba(255, 77, 109, 0.13) !important;
+  border-color: rgba(255, 77, 109, 0.4) !important;
+}
+.act-row.unread-alert.sev-high:hover td {
+  background: rgba(255, 77, 109, 0.2) !important;
+}
+.act-row.unread-alert.sev-high td:first-child {
+  border-left: 3px solid var(--bad) !important;
+}
+
 .btn {
   background: rgba(255, 255, 255, 0.06);
   border: 1px solid var(--line);

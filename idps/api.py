@@ -175,7 +175,9 @@ def _active_blocks():
 @login_required
 def overview():
     now = time.time()
-    since = now - 86400
+    period = request.args.get("period", "24h")
+    period_secs = {"24h": 86400, "7d": 7 * 86400, "30d": 30 * 86400}.get(period, 86400)
+    since = now - period_secs
     sev = {r["severity"]: r["n"] for r in db.q("SELECT severity, SUM(count) n FROM events WHERE ingested>? GROUP BY severity", (since,))}
     start = int(now // 60) * 60 - 59 * 60
     series = [{"t": start + 60 * i, "low": 0, "medium": 0, "high": 0} for i in range(60)]
@@ -244,6 +246,13 @@ def alerts():
         args += ["%" + q + "%"] * 4
     if request.args.get("sim") == "0":
         where.append("simulated=0")
+    days = request.args.get("days")
+    if days:
+        try:
+            where.append("ingested>?")
+            args.append(time.time() - int(days) * 86400)
+        except (ValueError, TypeError):
+            pass
     before = request.args.get("before")
     if before:
         where.append("id<?")
